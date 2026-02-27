@@ -5,12 +5,11 @@ import remarkGfm from "remark-gfm";
 import { BookOpen, Copy, CheckCircle } from "lucide-react";
 import { useState } from "react";
 
-export default function ReportViewer({ report }: { report: string[] }) {
+export default function ReportViewer({ report }: { report: string }) {  // ✅ string, not string[]
   const [copied, setCopied] = useState(false);
-  const content = report.join("\n\n");
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(content);
+    navigator.clipboard.writeText(report);  // ✅ use report directly
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -22,15 +21,23 @@ export default function ReportViewer({ report }: { report: string[] }) {
           <BookOpen size={18} className="text-accent" />
           Intelligence Synthesis
         </div>
-        <button onClick={copyToClipboard} className="text-muted-foreground hover:text-accent transition-colors">
-          {copied ? <CheckCircle size={18} className="text-emerald-500" /> : <Copy size={18} />}
+        <button
+          onClick={copyToClipboard}
+          className="text-muted-foreground hover:text-accent transition-colors"
+          aria-label="Copy report to clipboard"
+        >
+          {copied ? (
+            <CheckCircle size={18} className="text-emerald-500" />
+          ) : (
+            <Copy size={18} />
+          )}
         </button>
       </div>
 
       <div className="p-8 md:p-12">
         <article className="prose prose-invert max-w-none">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {content}
+            {report}  
           </ReactMarkdown>
         </article>
       </div>
