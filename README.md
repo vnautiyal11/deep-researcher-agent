@@ -1,42 +1,152 @@
-🧠 System Architecture
-The agent follows a Stateful Graph workflow:Planner Node: Analyzes the user query and generates N specific search research targets.
-Researcher Node: Executes concurrent searches via Tavily, collecting raw data and citations.
-Synthesizer Node: Performs a "Reasoning Pass" using Llama 3.3 to cross-reference data and remove contradictions.
-Writer Node: Formats the final state into a professional Markdown report.
+# DeepScan.AI — Autonomous Deep Research Agent
 
-🚀 Getting Started
-1. Clone & Install Backend
+An AI-powered research engine that autonomously searches the web, synthesizes multiple sources, and generates comprehensive technical reports — all from a single query.
+
+🌐 **Live App:** [deep-researcher-multiagent.vercel.app](https://deep-researcher-multiagent.vercel.app)
+⚙️ **API:** [deepscan-2mrc.onrender.com](https://deepscan-2mrc.onrender.com)
+
+---
+
+## How It Works
+
+1. You enter a research topic
+2. The AI agent generates a research plan
+3. It autonomously searches and scrapes multiple web sources
+4. It synthesizes the data and eliminates information gaps
+5. A structured Markdown report is returned in the UI
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14, TypeScript, Tailwind CSS |
+| Backend | FastAPI, Python |
+| AI Agent | LangGraph, LangChain |
+| Deployment | Vercel (frontend), Render (backend) |
+
+---
+
+## Project Structure
+
+```
+deep-researcher-agent/
+├── backend/
+│   ├── app/
+│   │   ├── agent.py        # LangGraph agent workflow
+│   │   ├── main.py         # FastAPI server
+│   │   ├── schema.py       # Pydantic models
+│   │   └── tools.py        # Web search & scraping tools
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── .env
+└── frontend/
+    ├── app/
+    │   ├── page.tsx         # Main page
+    │   └── layout.tsx
+    └── components/
+        ├── ResearchForm.tsx  # Search input
+        ├── AgentTerminal.tsx # Live step tracker
+        └── ReportViewer.tsx  # Markdown report renderer
+```
+
+---
+
+## Running Locally
+
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- API keys for your LLM and search provider (set in `backend/.env`)
+
+### Backend
+
+```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # venv\Scripts\activate on Windows
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Mac/Linux
 pip install -r requirements.txt
-
-2. Environment Setup
-Create a .env file in the backend folder:
-Code snippet
-GROQ_API_KEY=your_gsk_key
-TAVILY_API_KEY=your_tvly_key
-
-
-3. Launch the System
-Backend:
 uvicorn app.main:app --reload --port 8000
+```
 
-Frontend:
+### Frontend
+
+```bash
 cd frontend
 npm install
 npm run dev
+```
 
-✨ Key Features
-Real-Time Terminal: A live execution log showing the agent's "chain of thought" as it works.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Markdown Reports: Beautifully rendered research findings with bold headers and technical lists.
+### Environment Variables
 
-Stateful Memory: Uses LangGraph to ensure the agent doesn't repeat searches and covers all planned topics.
+Create `backend/.env`:
+```
+OPENAI_API_KEY=your_key_here
+TAVILY_API_KEY=your_key_here   # or whichever search API you use
+```
 
-📈 Future Roadmap
-[1] PDF Export: Allow users to download research as formatted documents.
+Create `frontend/.env.local`:
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-[2] Multi-Source Verification: Integration with ArXiv and PubMed for academic validation.
+---
 
-[3] Human-in-the-loop: Ability for users to approve the search plan before execution.
+## Deployment
+
+### Backend → Render
+- Connect your GitHub repo to [Render](https://render.com)
+- Set root directory to `backend`
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Add your environment variables in Render's dashboard
+
+> **Note:** The free tier spins down after 15 min of inactivity. The first request may take 30–60 seconds to wake up. Use [UptimeRobot](https://uptimerobot.com) (free) to keep it alive.
+
+### Frontend → Vercel
+- Connect your GitHub repo to [Vercel](https://vercel.com)
+- Set root directory to `frontend`
+- Add environment variable: `NEXT_PUBLIC_API_URL=https://your-render-url.onrender.com`
+- Vercel auto-deploys on every push to `main`
+
+---
+
+## API Reference
+
+### `POST /research`
+
+**Request:**
+```json
+{ "topic": "your research topic here" }
+```
+
+**Response:**
+```json
+{
+  "report": "## Full Markdown Report...",
+  "steps": [
+    "✅ Intelligence connection established.",
+    "✅ Research plan generated.",
+    "✅ Analyzed 5 independent web sources.",
+    "✅ Synthesis complete.",
+    "✨ Technical report finalized."
+  ]
+}
+```
+
+### `GET /`
+Health check — returns engine status.
+
+---
+Screenshots:
+<img width="1898" height="770" alt="image" src="https://github.com/user-attachments/assets/b3387e90-1084-49d6-b330-5d04b6a15013" />
+<img width="1251" height="660" alt="image" src="https://github.com/user-attachments/assets/813b7c3d-67ea-4545-8b44-10f46d277fda" />
+<img width="1227" height="630" alt="image" src="https://github.com/user-attachments/assets/7b49ca8c-51d6-4ea7-83fc-63debeeab2cc" />
+
+## License
+
+MIT
